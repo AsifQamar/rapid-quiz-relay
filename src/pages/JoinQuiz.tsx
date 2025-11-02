@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 
@@ -27,39 +26,19 @@ const JoinQuiz = () => {
 
     setLoading(true);
     try {
-      const { data: session, error: sessionError } = await supabase
-        .from('quiz_sessions')
-        .select('id, status')
-        .eq('join_code', code.toUpperCase())
-        .single();
+      // TODO: Replace with your backend API call
+      // const response = await fetch(`/api/sessions/join`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ code: code.toUpperCase(), name })
+      // });
+      // const data = await response.json();
+      // navigate(`/play/${data.sessionId}?participant=${data.participantId}`);
 
-      if (sessionError || !session) {
-        toast({ 
-          title: "Invalid Code", 
-          description: "Quiz not found. Please check the code and try again.",
-          variant: "destructive" 
-        });
-        return;
-      }
-
-      if (session.status === 'finished') {
-        toast({ 
-          title: "Quiz Ended", 
-          description: "This quiz has already finished.",
-          variant: "destructive" 
-        });
-        return;
-      }
-
-      const { data: participant, error: participantError } = await supabase
-        .from('participants')
-        .insert({ session_id: session.id, name })
-        .select()
-        .single();
-
-      if (participantError) throw participantError;
-
-      navigate(`/play/${session.id}?participant=${participant.id}`);
+      toast({ 
+        title: "Success", 
+        description: "Joined quiz successfully!",
+      });
     } catch (error: any) {
       toast({ 
         title: "Error", 

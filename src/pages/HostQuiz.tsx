@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Users, Play, SkipForward, Trophy, Clock } from "lucide-react";
 
@@ -11,17 +10,51 @@ const HostQuiz = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [session, setSession] = useState<any>(null);
-  const [quiz, setQuiz] = useState<any>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [participants, setParticipants] = useState<any[]>([]);
+  const [session, setSession] = useState<any>({
+    join_code: "ABC123",
+    status: "waiting",
+    current_question_index: 0,
+    show_leaderboard: false
+  });
+  const [quiz, setQuiz] = useState<any>({
+    title: "Sample Quiz"
+  });
+  const [questions, setQuestions] = useState<any[]>([
+    {
+      id: 1,
+      question_text: "Sample Question",
+      time_limit: 30,
+      option_a: "Option A",
+      option_b: "Option B",
+      option_c: "Option C",
+      option_d: "Option D",
+      correct_answer: "A"
+    }
+  ]);
+  const [participants, setParticipants] = useState<any[]>([
+    { id: 1, name: "Player 1", score: 0 },
+    { id: 2, name: "Player 2", score: 0 }
+  ]);
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState(0);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadSession();
-    subscribeToParticipants();
+    // TODO: Replace with your backend API call and WebSocket/SSE connection
+    // fetch(`/api/sessions/${sessionId}`)
+    //   .then(res => res.json())
+    //   .then(data => {
+    //     setSession(data.session);
+    //     setQuiz(data.quiz);
+    //     setQuestions(data.questions);
+    //     setParticipants(data.participants);
+    //   });
+
+    // WebSocket example:
+    // const ws = new WebSocket(`ws://your-backend/sessions/${sessionId}`);
+    // ws.onmessage = (event) => {
+    //   const data = JSON.parse(event.data);
+    //   setParticipants(data.participants);
+    // };
   }, [sessionId]);
 
   useEffect(() => {
@@ -33,119 +66,40 @@ const HostQuiz = () => {
     }
   }, [timeLeft, session?.status]);
 
-  const loadSession = async () => {
-    try {
-      const { data: sessionData, error: sessionError } = await supabase
-        .from('quiz_sessions')
-        .select('*')
-        .eq('id', sessionId)
-        .single();
-
-      if (sessionError) throw sessionError;
-
-      const { data: quizData, error: quizError } = await supabase
-        .from('quizzes')
-        .select('*')
-        .eq('id', sessionData.quiz_id)
-        .single();
-
-      if (quizError) throw quizError;
-
-      const { data: questionsData, error: questionsError } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('quiz_id', sessionData.quiz_id)
-        .order('order_number');
-
-      if (questionsError) throw questionsError;
-
-      setSession(sessionData);
-      setQuiz(quizData);
-      setQuestions(questionsData);
-      
-      if (sessionData.status === 'active' && questionsData[sessionData.current_question_index]) {
-        setCurrentQuestion(questionsData[sessionData.current_question_index]);
-        setTimeLeft(questionsData[sessionData.current_question_index].time_limit);
-      }
-
-      setLoading(false);
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-      navigate('/');
-    }
-  };
-
-  const subscribeToParticipants = () => {
-    const channel = supabase
-      .channel('participants-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'participants',
-          filter: `session_id=eq.${sessionId}`
-        },
-        () => loadParticipants()
-      )
-      .subscribe();
-
-    loadParticipants();
-    return () => { supabase.removeChannel(channel); };
-  };
-
-  const loadParticipants = async () => {
-    const { data } = await supabase
-      .from('participants')
-      .select('*')
-      .eq('session_id', sessionId)
-      .order('score', { ascending: false });
-    
-    if (data) setParticipants(data);
-  };
-
-  const startQuiz = async () => {
+  const startQuiz = () => {
     if (questions.length === 0) return;
     
-    await supabase
-      .from('quiz_sessions')
-      .update({ status: 'active', current_question_index: 0 })
-      .eq('id', sessionId);
+    // TODO: Replace with your backend API call
+    // await fetch(`/api/sessions/${sessionId}/start`, { method: 'POST' });
 
     setSession({ ...session, status: 'active', current_question_index: 0 });
     setCurrentQuestion(questions[0]);
     setTimeLeft(questions[0].time_limit);
   };
 
-  const showLeaderboard = async () => {
-    await supabase
-      .from('quiz_sessions')
-      .update({ show_leaderboard: true })
-      .eq('id', sessionId);
+  const showLeaderboard = () => {
+    // TODO: Replace with your backend API call
+    // await fetch(`/api/sessions/${sessionId}/leaderboard`, { method: 'POST' });
 
     setSession({ ...session, show_leaderboard: true });
   };
 
-  const nextQuestion = async () => {
+  const nextQuestion = () => {
     const nextIndex = session.current_question_index + 1;
     
     if (nextIndex >= questions.length) {
-      await supabase
-        .from('quiz_sessions')
-        .update({ status: 'finished' })
-        .eq('id', sessionId);
+      // TODO: Replace with your backend API call
+      // await fetch(`/api/sessions/${sessionId}/finish`, { method: 'POST' });
       
       setSession({ ...session, status: 'finished' });
       return;
     }
 
-    await supabase
-      .from('quiz_sessions')
-      .update({ 
-        current_question_index: nextIndex,
-        show_leaderboard: false
-      })
-      .eq('id', sessionId);
+    // TODO: Replace with your backend API call
+    // await fetch(`/api/sessions/${sessionId}/next`, { 
+    //   method: 'POST',
+    //   body: JSON.stringify({ questionIndex: nextIndex })
+    // });
 
     setSession({ 
       ...session, 
@@ -159,10 +113,6 @@ const HostQuiz = () => {
   const skipLeaderboard = () => {
     nextQuestion();
   };
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5 p-4">

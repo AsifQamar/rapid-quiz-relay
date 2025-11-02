@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Play, Copy, CheckCircle } from "lucide-react";
 
@@ -10,70 +9,63 @@ const QuizDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [quiz, setQuiz] = useState<any>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [quiz, setQuiz] = useState<any>({
+    title: "Sample Quiz",
+    description: "This is a sample quiz to demonstrate the UI"
+  });
+  const [questions, setQuestions] = useState<any[]>([
+    {
+      id: 1,
+      question_text: "Sample Question 1",
+      time_limit: 30,
+      option_a: "Option A",
+      option_b: "Option B",
+      option_c: "Option C",
+      option_d: "Option D",
+      correct_answer: "A"
+    },
+    {
+      id: 2,
+      question_text: "Sample Question 2",
+      time_limit: 45,
+      option_a: "Option A",
+      option_b: "Option B",
+      option_c: "",
+      option_d: "",
+      correct_answer: "B"
+    }
+  ]);
+  const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    loadQuiz();
+    // TODO: Replace with your backend API call
+    // fetch(`/api/quizzes/${id}`)
+    //   .then(res => res.json())
+    //   .then(data => {
+    //     setQuiz(data.quiz);
+    //     setQuestions(data.questions);
+    //   });
   }, [id]);
 
-  const loadQuiz = async () => {
+  const startQuiz = async () => {
+    setLoading(true);
     try {
-      const { data: quizData, error: quizError } = await supabase
-        .from('quizzes')
-        .select('*')
-        .eq('id', id)
-        .single();
+      // TODO: Replace with your backend API call
+      // const response = await fetch('/api/sessions', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ quizId: id })
+      // });
+      // const session = await response.json();
+      // navigate(`/host/${session.id}`);
 
-      if (quizError) throw quizError;
-
-      const { data: questionsData, error: questionsError } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('quiz_id', id)
-        .order('order_number');
-
-      if (questionsError) throw questionsError;
-
-      setQuiz(quizData);
-      setQuestions(questionsData);
+      toast({ title: "Starting quiz..." });
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
-  };
-
-  const startQuiz = async () => {
-    try {
-      const joinCode = generateCode();
-      const { data: session, error } = await supabase
-        .from('quiz_sessions')
-        .insert({
-          quiz_id: id,
-          join_code: joinCode,
-          status: 'waiting'
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      navigate(`/host/${session.id}`);
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    }
-  };
-
-  const generateCode = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
   };
 
   const copyQuizLink = () => {
@@ -83,10 +75,6 @@ const QuizDetails = () => {
     toast({ title: "Link Copied!", description: "Share this link with others" });
     setTimeout(() => setCopied(false), 2000);
   };
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5 py-8">
@@ -111,6 +99,7 @@ const QuizDetails = () => {
           <div className="flex gap-4">
             <Button
               onClick={startQuiz}
+              disabled={loading}
               size="lg"
               className="bg-gradient-to-r from-primary to-secondary"
             >

@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Image as ImageIcon, ArrowLeft } from "lucide-react";
 
@@ -68,12 +67,6 @@ const CreateQuiz = () => {
   };
 
   const createQuiz = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-
     if (!title.trim()) {
       toast({ title: "Error", description: "Please enter a quiz title", variant: "destructive" });
       return;
@@ -86,23 +79,16 @@ const CreateQuiz = () => {
 
     setLoading(true);
     try {
-      const { data: quiz, error: quizError } = await supabase
-        .from('quizzes')
-        .insert({ title, description, creator_id: user.id })
-        .select()
-        .single();
-
-      if (quizError) throw quizError;
-
-      const questionsWithQuizId = questions.map(q => ({ ...q, quiz_id: quiz.id }));
-      const { error: questionsError } = await supabase
-        .from('questions')
-        .insert(questionsWithQuizId);
-
-      if (questionsError) throw questionsError;
+      // TODO: Replace with your backend API call
+      // const response = await fetch('/api/quizzes', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ title, description, questions })
+      // });
+      // const quiz = await response.json();
 
       toast({ title: "Success!", description: "Quiz created successfully" });
-      navigate(`/quiz/${quiz.id}`);
+      // navigate(`/quiz/${quiz.id}`);
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {

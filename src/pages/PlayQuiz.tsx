@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Clock, Trophy, Loader2 } from "lucide-react";
 
@@ -12,17 +11,40 @@ const PlayQuiz = () => {
   const participantId = searchParams.get('participant');
   const { toast } = useToast();
   
-  const [session, setSession] = useState<any>(null);
-  const [currentQuestion, setCurrentQuestion] = useState<any>(null);
-  const [participant, setParticipant] = useState<any>(null);
-  const [participants, setParticipants] = useState<any[]>([]);
+  const [session, setSession] = useState<any>({
+    status: "waiting",
+    show_leaderboard: false
+  });
+  const [currentQuestion, setCurrentQuestion] = useState<any>({
+    question_text: "Sample Question",
+    option_a: "Option A",
+    option_b: "Option B",
+    option_c: "Option C",
+    option_d: "Option D",
+    time_limit: 30
+  });
+  const [participant, setParticipant] = useState<any>({
+    name: "Player",
+    score: 0
+  });
+  const [participants, setParticipants] = useState<any[]>([
+    { id: 1, name: "Player 1", score: 100 },
+    { id: 2, name: "Player 2", score: 50 }
+  ]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
 
   useEffect(() => {
-    loadData();
-    subscribeToSession();
+    // TODO: Replace with your backend WebSocket/SSE connection
+    // const ws = new WebSocket(`ws://your-backend/sessions/${sessionId}?participant=${participantId}`);
+    // ws.onmessage = (event) => {
+    //   const data = JSON.parse(event.data);
+    //   setSession(data.session);
+    //   setCurrentQuestion(data.currentQuestion);
+    //   setTimeLeft(data.timeLeft);
+    //   setParticipants(data.participants);
+    // };
   }, [sessionId, participantId]);
 
   useEffect(() => {
@@ -32,126 +54,28 @@ const PlayQuiz = () => {
     }
   }, [timeLeft, session?.status, hasAnswered]);
 
-  const loadData = async () => {
-    const { data: sessionData } = await supabase
-      .from('quiz_sessions')
-      .select('*')
-      .eq('id', sessionId)
-      .single();
-
-    if (sessionData) {
-      setSession(sessionData);
-      
-      if (sessionData.status === 'active') {
-        const { data: questionsData } = await supabase
-          .from('questions')
-          .select('*')
-          .eq('quiz_id', sessionData.quiz_id)
-          .order('order_number');
-
-        if (questionsData && questionsData[sessionData.current_question_index]) {
-          const question = questionsData[sessionData.current_question_index];
-          setCurrentQuestion(question);
-          setTimeLeft(question.time_limit);
-          checkIfAnswered(question.id);
-        }
-      }
-    }
-
-    const { data: participantData } = await supabase
-      .from('participants')
-      .select('*')
-      .eq('id', participantId)
-      .single();
-
-    if (participantData) {
-      setParticipant(participantData);
-    }
-
-    loadParticipants();
-  };
-
-  const loadParticipants = async () => {
-    const { data } = await supabase
-      .from('participants')
-      .select('*')
-      .eq('session_id', sessionId)
-      .order('score', { ascending: false });
-    
-    if (data) setParticipants(data);
-  };
-
-  const checkIfAnswered = async (questionId: string) => {
-    const { data } = await supabase
-      .from('answers')
-      .select('answer')
-      .eq('session_id', sessionId)
-      .eq('participant_id', participantId)
-      .eq('question_id', questionId)
-      .single();
-
-    if (data) {
-      setSelectedAnswer(data.answer);
-      setHasAnswered(true);
-    } else {
-      setSelectedAnswer(null);
-      setHasAnswered(false);
-    }
-  };
-
-  const subscribeToSession = () => {
-    const channel = supabase
-      .channel('session-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'quiz_sessions',
-          filter: `id=eq.${sessionId}`
-        },
-        () => {
-          loadData();
-          loadParticipants();
-        }
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  };
-
   const submitAnswer = async (answer: string) => {
     if (hasAnswered || !currentQuestion) return;
 
     setSelectedAnswer(answer);
     setHasAnswered(true);
 
-    const timeTaken = currentQuestion.time_limit - timeLeft;
-    
-    const { error } = await supabase
-      .from('answers')
-      .insert({
-        session_id: sessionId,
-        participant_id: participantId,
-        question_id: currentQuestion.id,
-        answer,
-        time_taken: timeTaken
-      });
-
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-      return;
-    }
-
-    if (answer === currentQuestion.correct_answer) {
-      const points = Math.max(100, 1000 - (timeTaken * 10));
+    try {
+      // TODO: Replace with your backend API call
+      // await fetch('/api/answers', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ 
+      //     participantId, 
+      //     questionId: currentQuestion.id, 
+      //     answer,
+      //     timeTaken: currentQuestion.time_limit - timeLeft 
+      //   })
+      // });
       
-      await supabase
-        .from('participants')
-        .update({ score: (participant?.score || 0) + points })
-        .eq('id', participantId);
-
-      setParticipant({ ...participant, score: (participant?.score || 0) + points });
+      toast({ title: "Answer submitted!" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
@@ -164,14 +88,6 @@ const PlayQuiz = () => {
     };
     return colors[option as keyof typeof colors];
   };
-
-  if (!session) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-accent/10 p-4">
