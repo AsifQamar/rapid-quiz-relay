@@ -47,11 +47,11 @@ const Index = () => {
           {/* ^ 2. End of wrapper ^ */}
 
           <Card 
-            className="p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border-2 hover:border-secondary"
+            className=" rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border-2 hover:border-secondary"
             onClick={() => navigate('/join')}
           >
             <div className="flex flex-col items-center text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-secondary to-accent flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-secondary to-primary-glow flex items-center justify-center">
                 <Users className="w-8 h-8 text-secondary-foreground" />
               </div>
               <h2 className="text-2xl font-bold">Join Quiz</h2>
@@ -60,7 +60,7 @@ const Index = () => {
               </p>
               <Button 
                 size="lg" 
-                className="w-full bg-gradient-to-r from-secondary to-accent hover:opacity-90"
+                className="rounded-xl w-23 bg-gradient-to-r from-secondary to-primary-glow hover:opacity-90"
               >
                 Join Now
               </Button>
