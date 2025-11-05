@@ -1,20 +1,15 @@
 // convex/gameplay.ts
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
+// import { getAuthUserId } from "@convex-dev/auth/server"; // <-- REMOVED
 
-// Helper function to check if the user is the host
+// Helper function to check if the user is the host (AUTH REMOVED)
 const checkHost = async (ctx: any, sessionId: any) => {
   const session = await ctx.db.get(sessionId);
   if (!session) {
     throw new Error("Session not found.");
   }
-  const identity = await ctx.auth.getViewerIdentity();
-  const userId = identity?.subject ?? "anonymous"; // Default to "anonymous"
-
-  // Allow action if the session host was anonymous OR if the user is the host
-  if (session.hostId !== "anonymous" && session.hostId !== userId) {
-    throw new Error("Not authorized to perform this action.");
-  }
+  // Auth check removed. Any user can perform host actions.
   return session;
 };
 
@@ -27,7 +22,7 @@ export const startQuiz = mutation({
     // hostId removed from args
   },
   handler: async (ctx, args) => {
-    await checkHost(ctx, args.sessionId); // Security check
+    await checkHost(ctx, args.sessionId); // Security check (now just checks for session existence)
     await ctx.db.patch(args.sessionId, { status: "active" });
   },
 });
@@ -39,7 +34,7 @@ export const showLeaderboard = mutation({
     // hostId removed from args
   },
   handler: async (ctx, args) => {
-    await checkHost(ctx, args.sessionId); // Security check
+    await checkHost(ctx, args.sessionId); // Security check (now just checks for session existence)
     await ctx.db.patch(args.sessionId, { show_leaderboard: true });
   },
 });
@@ -51,7 +46,7 @@ export const nextQuestion = mutation({
     // hostId removed from args
   },
   handler: async (ctx, args) => {
-    const session = await checkHost(ctx, args.sessionId); // Security check
+    const session = await checkHost(ctx, args.sessionId); // Security check (now just checks for session existence)
     
     const questions = await ctx.db
       .query("questions")
