@@ -107,12 +107,9 @@ export const submitAnswer = mutation({
 
     // 3. Calculate score
     if (is_correct) {
-      const timeLimit = question.time_limit;
-      // Ensure time_taken isn't negative or over the limit
-      const effectiveTime = Math.max(0, Math.min(time_taken, timeLimit));
-      // Base 1000 points, 500 points penalty for max time
-      const timePenalty = (effectiveTime / timeLimit) * 500;
-      score = Math.round(1000 - timePenalty);
+      score = 1;
+    } else {
+      score = 0;
     }
 
     // 4. Save the answer
