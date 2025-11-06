@@ -23,7 +23,7 @@ const Index = () => {
           
           {/* V 2. Wrapper Removed V */}
           <Card 
-            className="p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border-2 hover:border-primary"
+            className="  rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border-2 hover:border-primary"
             onClick={() => navigate('/create-quiz')}
           >
             <div className="flex flex-col items-center text-center space-y-4">
@@ -36,7 +36,7 @@ const Index = () => {
               </p>
               <Button 
                 size="lg" 
-                className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
+                className="rounded-xl w-23 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
               >
                 Start Creating
               </Button>

@@ -106,13 +106,13 @@ const CreateQuiz = () => {
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-6 rounded-full"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" />
           Back to Home
         </Button>
 
-        <Card className="p-8">
+        <Card className="p-8 shadow-lg rounded-2xl border-2 border-transparent hover:border-primary transition-all duration-300">
           <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Create Your Quiz
           </h1>
@@ -144,8 +144,8 @@ const CreateQuiz = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Questions</h2>
-              <Button onClick={addQuestion} className="bg-gradient-to-r from-primary to-secondary">
-                <Plus className="mr-2 h-4 w-4" />
+              <Button onClick={addQuestion} className=" rounded-full bg-gradient-to-r from-primary to-secondary">
+                <Plus className=" h-4 w-4" />
                 Add Question
               </Button>
             </div>
@@ -233,7 +233,7 @@ const CreateQuiz = () => {
                       <select
                         value={question.correct_answer}
                         onChange={(e) => updateQuestion(index, 'correct_answer', e.target.value)}
-                        className="w-full mt-2 p-2 border rounded-md"
+                        className="w-full mt-2 p-2 border rounded-md pr-3"
                       >
                         <option value="A">A</option>
                         <option value="B">B</option>
@@ -258,12 +258,12 @@ const CreateQuiz = () => {
             ))}
           </div>
 
-          <div className="mt-8 flex gap-4">
+          <div className="w-23 mt-8 flex gap-4">
             <Button
               onClick={createQuiz}
               disabled={loading}
               size="lg"
-              className="flex-1 bg-gradient-to-r from-primary via-secondary to-accent"
+              className=" flex-1 bg-gradient-to-t from-primary via-secondary to-primary-glow hover:opacity-90"
             >
               {loading ? "Creating..." : "Create Quiz"}
             </Button>
