@@ -15,6 +15,7 @@ const HostQuiz = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [timerStarted, setTimerStarted] = useState(false);
   const [revealAnswerState, setRevealAnswerState] = useState(false);
+  const [showLeaderboardState, setShowLeaderboardState] = useState(false);
 
   // 4. Get all data from one real-time query
   const sessionData = useQuery(
@@ -192,13 +193,20 @@ const HostQuiz = () => {
                 )}
               </div>
 
-              <div className="flex justify-end mb-2">
+              <div className="flex gap-2 justify-end mb-2">
                 <Button
                   onClick={() => setRevealAnswerState((r) => !r)}
                   size="sm"
                   variant={revealAnswerState ? undefined : "outline"}
                 >
-                  {revealAnswerState ? "Hide Answer" : "Reveal Answer"}
+                Reveal Answer
+                </Button>
+                <Button
+                  onClick={() => setShowLeaderboardState((r) => !r)}
+                  size="sm"
+                  variant={showLeaderboardState ? undefined : "outline"}
+                >
+                 Show Leaderboard
                 </Button>
               </div>
 
@@ -206,7 +214,7 @@ const HostQuiz = () => {
                 {options.map(({ key: option, text: optionText }) => {
                   const colors = {
                     // default styling; admin can decide colors later
-                    default: 'from-white border border-gray-300 to-gray-100'
+                    default: 'gray-600 border-gray-300 '
                   } as Record<string, string>;
 
                   const isCorrect = revealAnswerState && currentQuestion?.correct_answer === option;
