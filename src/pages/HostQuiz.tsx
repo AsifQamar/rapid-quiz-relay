@@ -152,7 +152,7 @@ const HostQuiz = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5 p-4 ">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5 p-2 ">
       <div className="container max-w-6xl mx-auto mt-20">
         <Card className="p-4 mb-6">
           <div className="flex justify-between items-center mb-6">
@@ -210,11 +210,12 @@ const HostQuiz = () => {
               </div>
 
               {/* --- MODIFIED BUTTON GROUP --- */}
-              <div className="flex gap-2 justify-end mb-2">
+              <div className="flex gap-1 justify-end mb-2 ">
                 <Button
                   onClick={() => setRevealAnswerState((r) => !r)}
                   size="sm"
                   variant={revealAnswerState ? undefined : "outline"}
+                  className="px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base md:px-5 md:py-3 md:text-lg rounded-lg text-gray-600"
                 >
                 Reveal Answer
                 </Button>
@@ -222,16 +223,11 @@ const HostQuiz = () => {
                   onClick={handleShowLeaderboardClick} // <-- Use new handler
                   size="sm"
                   variant="outline" // <-- Removed dependency on local state
+                  className="px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base md:px-5 md:py-3 md:text-lg rounded-lg text-gray-600"
                 >
                  Show Leaderboard
                 </Button>
-                <Button
-                  onClick={nextQuestion} // <-- Added this button
-                  size="sm"
-                >
-                  Next
-                  <SkipForward className="h-4 w-4" />
-                </Button>
+                
               </div>
               {/* --- END MODIFIED BUTTON GROUP --- */}
 
@@ -256,12 +252,21 @@ const HostQuiz = () => {
                   );
                 })}
               </div>
+              {/*---Modified Button Group---*/}
+              <Button
+                  onClick={nextQuestion} // <-- Added this button
+                  size="sm"
+                  className=" display:center px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base md:px-5 md:py-3 md:text-lg rounded-lg"
+                >
+                  Next
+                  <SkipForward className="h-4 w-4" />
+                </Button>
             </div>
           )}
 
           {session?.status === 'active' && session?.show_leaderboard && (
             <div className="text-center py-12">
-              <Trophy className="h-16 w-16 mx-auto mb-4 text-warning" />
+              <Trophy className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 mx-auto mb-4 text-warning" />
               <h2 className="text-3xl font-bold mb-8">Leaderboard</h2>
               
               <div className="space-y-3 mb-8">
@@ -306,15 +311,15 @@ const HostQuiz = () => {
 
           {session?.status === 'finished' && (
             <div className="text-center py-12">
-              <Trophy className="h-20 w-20 mx-auto mb-4 text-warning" />
-              <h2 className="text-4xl font-bold mb-8">Quiz Finished!</h2>
+              <Trophy className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-20 lg:w-20 mx-auto mb-4 text-warning" />
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-bold mb-2">Quiz Finished!</h2>
               
-              <h3 className="text-2xl font-bold mb-4">Final Scores</h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl font-bold mb-4">Final Scores</h3>
               <div className="space-y-3 mb-8">
                 {participants?.map((p, i) => (
                   <div 
                     key={p._id}
-                    className={`flex justify-between items-center p-4 rounded-lg ${
+                    className={`flex justify-between items-center p-2 rounded-lg ${
                       i === 0 ? 'bg-warning/20 border-2 border-warning' : 'bg-muted'
                     }`}
                   >
@@ -327,7 +332,7 @@ const HostQuiz = () => {
                 ))}
               </div>
 
-              <Button onClick={() => navigate('/')} size="lg">
+              <Button onClick={() => navigate('/')} size="lg" className="rounded-full">
                 Back to Home
               </Button>
             </div>

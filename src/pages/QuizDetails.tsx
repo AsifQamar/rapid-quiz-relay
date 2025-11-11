@@ -86,9 +86,9 @@ const QuizDetails = () => {
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-6 rounded-full"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" />
           Back to Home
         </Button>
 
@@ -106,12 +106,12 @@ const QuizDetails = () => {
               onClick={startQuiz}
               disabled={loading}
               size="lg"
-              className="bg-gradient-to-r from-primary to-secondary"
+              className="bg-gradient-to-r from-primary to-secondary px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base md:px-5 md:py-3 md:text-lg rounded-lg"
             >
               {loading ? (
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <Loader2 className=" h-5 w-5 animate-spin" />
               ) : (
-                <Play className="mr-2 h-5 w-5" />
+                <Play className="h-5 w-5" />
               )}
               Start Quiz
             </Button>
@@ -119,6 +119,7 @@ const QuizDetails = () => {
               onClick={copyQuizLink}
               size="lg"
               variant="outline"
+              className="px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base md:px-5 md:py-3 md:text-lg rounded-lg"
             >
               {copied ? (
                 <>
@@ -127,7 +128,7 @@ const QuizDetails = () => {
                 </>
               ) : (
                 <>
-                  <Copy className="mr-2 h-5 w-5" />
+                  <Copy className="h-5 w-5" />
                   Copy Link
                 </>
               )}

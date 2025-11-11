@@ -197,6 +197,10 @@ const PlayQuiz = () => {
                       hasAnswered && isSelected
                         ? 'border-primary bg-primary/20'
                         : ''
+                    } ${
+                      hasAnswered  && currentQuestion.correct_answer === option
+                        ? 'border-primary bg-primary/20'
+                        : ''
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -274,17 +278,17 @@ const PlayQuiz = () => {
         )}
 
         {session.status === 'finished' && (
-          <Card className="p-12 text-center">
-            <Trophy className="h-20 w-20 mx-auto mb-4 text-warning" />
-            <h2 className="text-4xl font-bold mb-4">Quiz Finished!</h2>
-            <p className="text-2xl mb-8">Your final score: <span className="font-bold text-primary">{participant?.score || 0}</span></p>
+          <Card className="p-4 text-center">
+            <Trophy className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-20 lg:w-20  mx-auto mb-4 text-warning" />
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl  font-bold mb-1">Quiz Finished!</h2>
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl mb-8">Your final score: <span className="font-bold text-primary">{participant?.score || 0}</span></p>
             
-            <h3 className="text-2xl font-bold mb-4">Final Rankings</h3>
+            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl font-bold mb-3">Final Rankings</h3>
             <div className="space-y-3">
               {allParticipants?.map((p, i) => (
                 <div 
                   key={p._id}
-                  className={`flex justify-between items-center p-4 rounded-lg ${
+                  className={`flex justify-between items-center p-2 rounded-lg ${
                     p._id === participantId ? 'bg-primary/20 border-2 border-primary' :
                     i === 0 ? 'bg-warning/20 border-2 border-warning' :
                     'bg-muted'
@@ -298,7 +302,7 @@ const PlayQuiz = () => {
                 </div>
               ))}
             </div>
-            <Button onClick={() => navigate('/')} size="lg" className="mt-8">
+            <Button onClick={() => navigate('/')} size="lg" className="mt-8 rounded-full">
               Back to Home
             </Button>
           </Card>

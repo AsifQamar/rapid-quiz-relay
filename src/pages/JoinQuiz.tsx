@@ -43,7 +43,7 @@ const JoinQuiz = () => {
     } catch (error: any) {
       toast({ 
         title: "Failed to Join", 
-        description: `Error: ${error.message}`, // Show the real error
+        description: `Error: Quiz Code not found`, // Show the real error
         variant: "destructive" 
       });
     } finally {
