@@ -40,10 +40,11 @@ const JoinQuiz = () => {
       // 5. Navigate to the play screen on success
       navigate(`/play/${sessionId}?participant=${participantId}`);
 
-    } catch (error: any) {
+  } catch (error: any) {
+      const errorMessage = error.message || "An unknown error occurred.";
       toast({ 
         title: "Failed to Join", 
-        description: `Error: Quiz Code not found`, // Show the real error
+        description: errorMessage,
         variant: "destructive" 
       });
     } finally {
