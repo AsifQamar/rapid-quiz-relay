@@ -85,7 +85,6 @@ useEffect(() => {
     session?.currentQuestionEndTime,
     hasAnswered,
     currentQuestion?.time_limit, // <-- THIS IS THE FIX
-    toast
   ]);
 
 
