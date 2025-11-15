@@ -1,7 +1,7 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthUserId } from "@convex-dev/auth/server"; // Correct helper for Convex Auth
-import { Doc } from "./_generated/dataModel";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { Doc } from "./_generated/dataModel"; // <-- Import Doc
 
 // Helper function to generate a 6-character join code
 const generateJoinCode = () => {
@@ -74,8 +74,9 @@ export const joinSession = mutation({
       .first();
 
     if (!session) throw new Error("Quiz code not found.");
+    
     if (session.status !== "waiting")
-      throw new Error("This quiz is no longer accepting new players.");
+      throw new Error("This quiz has already started."); 
 
     const participantId = await ctx.db.insert("participants", {
       sessionId: session._id,
@@ -171,13 +172,15 @@ export const getPlayerSessionData = query({
 
       let answerStats: Record<string, number> = {};
       let hasAnswered = false;
-      let answerDoc: Doc<"answers"> | null = null;
+      // --- FIX: Define answerDoc here ---
+      let answerDoc: Doc<"answers"> | null = null; 
 
       // Map of participantId -> score awarded for the current question (if any)
       const currentQuestionScores: Record<string, number> = {};
 
       if (currentQuestion) {
-           answerDoc = await ctx.db
+        // --- FIX: Assign to the outer answerDoc ---
+        answerDoc = await ctx.db
           .query("answers")
           .withIndex("by_participant_question", (q) =>
             q.eq("participantId", args.participantId).eq("questionId", currentQuestion._id)
@@ -233,7 +236,8 @@ export const getPlayerSessionData = query({
       allParticipants: visibleParticipants,
       currentQuestion,
       answerStats,
-      submittedAnswer: answerDoc?.answer || null,
+      hasAnswered,
+      submittedAnswer: answerDoc?.answer || null, // <-- This line will now work
     };
   },
 });
