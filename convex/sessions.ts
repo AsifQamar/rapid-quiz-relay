@@ -231,7 +231,7 @@ export const getPlayerSessionData = query({
       allParticipants: visibleParticipants,
       currentQuestion,
       answerStats,
-      hasAnswered,
+      submittedAnswer: answerDoc?.answer || null,
     };
   },
 });
