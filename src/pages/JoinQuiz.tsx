@@ -53,10 +53,8 @@ const JoinQuiz = () => {
       navigate(`/play/${sessionId}?participant=${participantId}`);
 
   } catch (error: any) {
-      // If the session has already started, the server throws a message indicating
-      // the quiz is no longer accepting new players. Show a clearer toast in that case.
       const serverMessage = error?.message ? String(error.message) : "";
-      let description = "An unknown error occured."; // intentionally the user's spelling
+      let description = "An unknown error occured.";
 
       if (/no longer accepting/i.test(serverMessage) || /already started/i.test(serverMessage)) {
         description = "Quiz has already started.";
@@ -72,15 +70,12 @@ const JoinQuiz = () => {
     }
   };
 
-  // 6. The "waiting" screen logic has been removed.
-  // The PlayQuiz page will now handle all states: waiting, active, and finished.
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-white/40 via-white/600 to-white/80 dark:bg-gradient-to-b dark:from-black/80 dark:via-black/80 dark:to-black/80 flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-8 bg-card border-border border-x-primary-foreground-30 rounded-3xl shadow-2xl">
         <Button
           variant="ghost"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/')}
           className="mb-6 text-primary hover:text-primary hover:bg-primary/10 hover: rounded-full"
         >
           <ArrowLeft className=" h-4 w-4" />

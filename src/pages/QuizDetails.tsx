@@ -85,7 +85,7 @@ const QuizDetails = () => {
       <div className="container max-w-4xl mx-auto px-4">
         <Button
           variant="ghost"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
           className="mb-6 rounded-full"
         >
           <ArrowLeft className="h-4 w-4" />
