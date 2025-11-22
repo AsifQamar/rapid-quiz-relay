@@ -2,19 +2,24 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 
+// Grace period in milliseconds to account for network latency
+const GRACE_PERIOD_MS = 5000; 
 
-// Helper function to check if the user is the host (AUTH REMOVED)
 // Helper function to check if the user is the host
+// OPTIMIZATION: Fetches session and identity in parallel to reduce latency
 const checkHost = async (ctx: any, sessionId: any) => {
-  const session = await ctx.db.get(sessionId);
+  const [session, identity] = await Promise.all([
+    ctx.db.get(sessionId),
+    ctx.auth.getUserIdentity()
+  ]);
+
   if (!session) {
     throw new Error("Session not found.");
   }
 
-  const identity = await ctx.auth.getUserIdentity();
-if (session.hostId !== identity?.subject) {
-  throw new Error("You are not authorized to perform this action.");
-}
+  if (session.hostId !== identity?.subject) {
+    throw new Error("You are not authorized to perform this action.");
+  }
   return session;
 };
 
@@ -24,12 +29,10 @@ if (session.hostId !== identity?.subject) {
 export const startQuiz = mutation({
   args: { 
     sessionId: v.id("quiz_sessions"),
-    // hostId removed from args
   },
   handler: async (ctx, args) => {
-    const session = await checkHost(ctx, args.sessionId); // Security check (now just checks for session existence)
+    const session = await checkHost(ctx, args.sessionId); 
     
-    // --- ADDED BLOCK ---
     // Get the first question to set the timer
     const firstQuestion = await ctx.db
       .query("questions")
@@ -50,7 +53,6 @@ export const startQuiz = mutation({
       currentQuestionStartTime: startTime,
       currentQuestionEndTime: endTime,
     });
-    // --- END BLOCK ---
   },
 });
 
@@ -58,10 +60,9 @@ export const startQuiz = mutation({
 export const showLeaderboard = mutation({
   args: { 
     sessionId: v.id("quiz_sessions"),
-    // hostId removed from args
   },
   handler: async (ctx, args) => {
-    await checkHost(ctx, args.sessionId); // Security check (now just checks for session existence)
+    await checkHost(ctx, args.sessionId);
     await ctx.db.patch(args.sessionId, { show_leaderboard: true });
   },
 });
@@ -70,10 +71,9 @@ export const showLeaderboard = mutation({
 export const nextQuestion = mutation({
   args: { 
     sessionId: v.id("quiz_sessions"),
-    // hostId removed from args
   },
   handler: async (ctx, args) => {
-    const session = await checkHost(ctx, args.sessionId); // Security check (now just checks for session existence)
+    const session = await checkHost(ctx, args.sessionId);
     
     const questions = await ctx.db
       .query("questions")
@@ -87,13 +87,10 @@ export const nextQuestion = mutation({
       // End of quiz
       await ctx.db.patch(args.sessionId, { 
         status: "finished",
-        // --- ADDED ---
         currentQuestionStartTime: undefined,
         currentQuestionEndTime: undefined,
-        // --- END ADDED ---
       });
     } else {
-      // --- MODIFIED BLOCK ---
       // Move to next question and set its timers
       const nextQuestion = questions[nextIndex];
       const timeLimitMs = nextQuestion.time_limit * 1000;
@@ -108,7 +105,6 @@ export const nextQuestion = mutation({
         currentQuestionStartTime: startTime, // Set new start time
         currentQuestionEndTime: endTime,     // Set new end time
       });
-      // --- END MODIFIED BLOCK ---
     }
   },
 });
@@ -144,8 +140,9 @@ export const submitAnswer = mutation({
     const session = await ctx.db.get(sessionId);
     if (!session) throw new Error("Session not found.");
     
+    // Use grace period for latency
     const isLate = session.currentQuestionEndTime 
-                   ? Date.now() > session.currentQuestionEndTime 
+                   ? Date.now() > (session.currentQuestionEndTime + GRACE_PERIOD_MS)
                    : false;
     // --- END VALIDATION BLOCK ---
 
