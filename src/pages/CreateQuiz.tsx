@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Image as ImageIcon, ArrowLeft, Settings } from "lucide-react";
-import { useMutation } from "convex/react"; 
+import { useMutation, useQuery } from "convex/react"; 
 import { api } from "../../convex/_generated/api"; 
+import { Id } from "../../convex/_generated/dataModel";
 
 type Question = {
   question_text: string;
@@ -21,8 +22,12 @@ type Question = {
 
 const CreateQuiz = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const quizIdParam = searchParams.get("quizId");
+  
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<Question[]>([
@@ -35,11 +40,44 @@ const CreateQuiz = () => {
       order_number: 0
     }
   ]);
-  const [timeForAll, setTimeForAll] = useState(30); // New state for uniform time setting
+  const [timeForAll, setTimeForAll] = useState(30);
   const [showSettings, setShowSettings] = useState(false);
   const [applyDefaultTime, setApplyDefaultTime] = useState(false);
 
+  // Fetch existing quiz data if in edit mode
+  const existingQuiz = useQuery(
+    api.quizzes.getQuizDetails, 
+    quizIdParam ? { id: quizIdParam as Id<"quizzes"> } : "skip"
+  );
+
   const createQuizMutation = useMutation(api.quizzes.createQuiz);
+  const editQuizMutation = useMutation(api.quizzes.editQuiz);
+
+  // Populate form when existing data loads
+  useEffect(() => {
+    if (existingQuiz) {
+      setTitle(existingQuiz.quiz.title);
+      setDescription(existingQuiz.quiz.description || "");
+      
+      if (existingQuiz.questions.length > 0) {
+        const formattedQuestions: Question[] = existingQuiz.questions.map(q => {
+          const options = [q.option_a, q.option_b];
+          if (q.option_c) options.push(q.option_c);
+          if (q.option_d) options.push(q.option_d);
+
+          return {
+            question_text: q.question_text,
+            question_image_url: q.question_image_url || "",
+            options: options,
+            correct_answer: q.correct_answer,
+            time_limit: q.time_limit,
+            order_number: q.order_number,
+          };
+        });
+        setQuestions(formattedQuestions);
+      }
+    }
+  }, [existingQuiz]);
 
   const TIME_OPTIONS: { label: string; value: number }[] = [
     { label: "5 secs", value: 5 },
@@ -97,7 +135,6 @@ const CreateQuiz = () => {
     const updated = [...questions];
     const opts = [...updated[qIndex].options];
     
-    // FIX: Limit to 4 options (A, B, C, D) to match backend schema and prevent errors
     if (opts.length >= 4) {
       toast({ title: "Maximum Options", description: "You can add up to 4 options.", variant: "destructive" });
       return;
@@ -111,9 +148,8 @@ const CreateQuiz = () => {
   const removeOption = (qIndex: number, optIndex: number) => {
     const updated = [...questions];
     const opts = [...updated[qIndex].options];
-    if (opts.length <= 2) return; // enforce minimum 2 options
+    if (opts.length <= 2) return; 
     opts.splice(optIndex, 1);
-    // if the removed option was before the correct answer, shift correct_answer
     const letters = opts.map((_, i) => String.fromCharCode(65 + i));
     let correct = updated[qIndex].correct_answer;
     if (!letters.includes(correct)) correct = letters[0] || "A";
@@ -136,13 +172,12 @@ const CreateQuiz = () => {
     }
   };
 
-  const createQuiz = async () => {
+  const handleSave = async () => {
     if (!title.trim()) {
       toast({ title: "Error", description: "Please enter a quiz title", variant: "destructive" });
       return;
     }
 
-    // Validate required fields and at least two options per question
     for (const q of questions) {
       if (!q.question_text.trim()) {
         toast({ title: "Error", description: "Please fill in all required fields", variant: "destructive" });
@@ -152,7 +187,6 @@ const CreateQuiz = () => {
         toast({ title: "Error", description: "Each question needs at least two options", variant: "destructive" });
         return;
       }
-      // ensure correct_answer is within available options
       const letters = q.options.map((_, i) => String.fromCharCode(65 + i));
       if (!letters.includes(q.correct_answer)) {
         toast({ title: "Error", description: "Correct answer must match an available option", variant: "destructive" });
@@ -162,13 +196,13 @@ const CreateQuiz = () => {
 
     setLoading(true);
     try {
-      const mappedQuestions = questions.map((q) => {
+      const mappedQuestions = questions.map((q, index) => {
         const mapped: any = {
           question_text: q.question_text,
           question_image_url: q.question_image_url || undefined,
           correct_answer: q.correct_answer,
           time_limit: q.time_limit,
-          order_number: q.order_number,
+          order_number: index, // Force sequential order
         };
 
         q.options.forEach((opt, i) => {
@@ -179,21 +213,37 @@ const CreateQuiz = () => {
         return mapped;
       });
 
-      const quizId = await createQuizMutation({
-        title,
-        description,
-        questions: mappedQuestions,
-      });
+      if (quizIdParam) {
+        // --- EDIT MODE ---
+        await editQuizMutation({
+          quizId: quizIdParam as Id<"quizzes">,
+          title,
+          description,
+          questions: mappedQuestions,
+        });
+        toast({ title: "Success!", description: "Quiz updated successfully" });
+      } else {
+        // --- CREATE MODE ---
+        await createQuizMutation({
+          title,
+          description,
+          questions: mappedQuestions,
+        });
+        toast({ title: "Success!", description: "Quiz created successfully" });
+      }
 
-      toast({ title: "Success!", description: "Quiz created successfully" });
       navigate("/dashboard");
 
     } catch (error: any) {
-      toast({ title: "Error", description: `Failed to create quiz: ${error.message}`, variant: "destructive" });
+      toast({ title: "Error", description: `Failed to save quiz: ${error.message}`, variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
+
+  if (quizIdParam && !existingQuiz) {
+     return <div className="min-h-screen flex items-center justify-center">Loading quiz data...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white/40 via-accent/60 to-white/80 dark:bg-gradient-to-b dark:from-black/80 dark:via-black/80 dark:to-black/80 py-8">
@@ -209,7 +259,7 @@ const CreateQuiz = () => {
 
         <Card className="p-8 shadow-lg rounded-2xl border-2 border-transparent hover:border-primary transition-all duration-300">
           <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Create Your Quiz
+            {quizIdParam ? "Edit Quiz" : "Create Your Quiz"}
           </h1>
 
           <div className="space-y-6 mb-8">
@@ -430,12 +480,12 @@ const CreateQuiz = () => {
 
            <div className="w-23 mt-8 flex gap-4">
              <Button
-               onClick={createQuiz}
+               onClick={handleSave}
                disabled={loading}
                size="lg"
                className=" flex-1 bg-gradient-to-t from-primary via-secondary to-primary-glow hover:opacity-90"
              >
-               {loading ? "Creating..." : "Create Quiz"}
+               {loading ? "Saving..." : (quizIdParam ? "Update Quiz" : "Create Quiz")}
              </Button>
            </div>
          </Card>
