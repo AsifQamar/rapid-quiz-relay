@@ -81,7 +81,7 @@ const QuizDetails = () => {
   // Auth logic removed
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white/40 via-white/60 to-white/80 dark:bg-gradient-to-b dark:from-black/80 dark:via-black/80 dark:to-black/80 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-white/40 via-accent/60 to-white/80 dark:bg-gradient-to-b dark:from-black/80 dark:via-black/80 dark:to-black/80 py-8">
       <div className="container max-w-4xl mx-auto px-4">
         <Button
           variant="ghost"

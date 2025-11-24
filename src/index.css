@@ -127,6 +127,7 @@ All colors MUST be HSL.
     background-attachment: fixed;
 
     background-position:  bottom;
+    font-family:Arial, Helvetica, sans-serif;
 
   }
 
@@ -135,21 +136,16 @@ All colors MUST be HSL.
 
 
 @keyframes fadeInUp {
-
   from {
-
     opacity: 0;
-
-    transform: translateY(30px);
-
+    transform: translateY(12px);
   }
-
   to {
-
     opacity: 1;
-
     transform: translateY(0);
-
   }
+}
 
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
 }
