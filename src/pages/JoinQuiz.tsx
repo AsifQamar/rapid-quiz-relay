@@ -76,13 +76,13 @@ const JoinQuiz = () => {
         <Button
           variant="ghost"
           onClick={() => navigate(isSignedIn ? '/dashboard' : '/')}
-          className="mb-6 text-primary hover:text-primary hover:bg-primary/10 hover: rounded-full"
+          className="mb-6  hover:text-zinc-400 hover:bg-primary/10 hover: rounded-full text-zinc-500"
         >
           <ArrowLeft className=" h-4 w-4" />
           Back
         </Button>
 
-        <h1 className="text-4xl font-bold mb-2 text-primary">
+        <h1 className="text-4xl font-bold mb-2 text-orange-300">
           Join Quiz
         </h1>
         <p className="text-muted-foreground mb-8">
@@ -91,7 +91,7 @@ const JoinQuiz = () => {
 
         <div className="space-y-6">
           <div>
-            <Label htmlFor="code" className="text-foreground">Quiz Code</Label>
+            <Label htmlFor="code" className="dark:text-zinc-300">Quiz Code</Label>
             <Input
               id="code"
               value={code}
@@ -103,7 +103,7 @@ const JoinQuiz = () => {
           </div>
 
           <div>
-            <Label htmlFor="name" className="text-foreground">Your Name</Label>
+            <Label htmlFor="name" className="dark:text-zinc-300">Your Name</Label>
             <Input
               id="name"
               value={name}

@@ -251,7 +251,7 @@ const CreateQuiz = () => {
         <Button
           variant="ghost"
           onClick={() => navigate('/dashboard')}
-          className="mb-6 rounded-full text-gray-500"
+          className="mb-6 rounded-full text-gray-500 dark:hover:bg-orange-300/50"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Home
@@ -378,7 +378,7 @@ const CreateQuiz = () => {
                       value={question.question_text}
                       onChange={(e) => updateQuestion(index, 'question_text', e.target.value)}
                       placeholder="Enter your question"
-                      className="mt-2"
+                      className="mt-2 dark:text-zinc-300"
                     />
                   </div>
 
@@ -405,7 +405,7 @@ const CreateQuiz = () => {
                               value={opt}
                               onChange={(e) => updateOption(index, optIndex, e.target.value)}
                               placeholder={`Option ${letter}`}
-                              className="mt-2 text-xs"
+                              className="mt-2 text-xs dark:text-zinc-300"
                             />
                           </div>
                           <div className="flex-1">
@@ -446,7 +446,7 @@ const CreateQuiz = () => {
                       <select
                         value={question.correct_answer}
                         onChange={(e) => updateQuestion(index, 'correct_answer', e.target.value)}
-                        className="w-full mt-2 p-2 border rounded-md pr-3"
+                        className="w-full mt-2 p-2 border rounded-md pr-3 dark:text-zinc-300"
                       >
                         {question.options.map((_, i) => {
                           const letter = String.fromCharCode(65 + i);
@@ -461,7 +461,7 @@ const CreateQuiz = () => {
                       <select
                         value={question.time_limit}
                         onChange={(e) => updateQuestion(index, 'time_limit', parseInt(e.target.value))}
-                        className="w-full mt-2 p-2 border rounded-md pr-3"
+                        className="w-full mt-2 p-2 border rounded-md pr-3 dark:text-zinc-300"
                       >
                         {TIME_OPTIONS.map((opt) => (
                           <option key={opt.value} value={opt.value}>{opt.label}</option>

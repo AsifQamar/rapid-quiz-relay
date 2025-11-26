@@ -127,7 +127,7 @@ const QuizDetails = () => {
         <Button
           variant="ghost"
           onClick={() => navigate('/dashboard')}
-          className="hover:bg-gradient-to-r from-primary to-secondary mb-6 rounded-full"
+          className="hover:bg-gradient-to-r from-primary to-secondary mb-6 rounded-full text-zinc-500"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Home
@@ -135,7 +135,7 @@ const QuizDetails = () => {
 
         <Card className="flex flex-col lg:flex-row justify-between items-betwwun px-4 py-3 mb-6">
           <div>
-            <h1 className="text-2xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold mb-2 bg-gradient-to-b from-primary to-secondary via-orange-300 bg-clip-text text-transparent">
               {quiz?.title}
             </h1>
             {quiz?.description && (
@@ -160,7 +160,7 @@ const QuizDetails = () => {
               onClick={copyQuizLink}
               size="sm"
               variant="outline"
-              className="hover:bg-gradient-to-r from-primary to-secondary px-2 py-2 text-sm sm:px-4 sm:py-2 sm:text-base md:px-5 md:py-3 md:text-md rounded-lg"
+              className="hover:bg-gradient-to-r from-primary to-secondary px-2 py-2 text-sm sm:px-4 sm:py-2 sm:text-base md:px-5 md:py-3 md:text-md rounded-lg dark:text-zinc-400 hover:dark:text-black"
             >
               {copied ? (
                 <>
@@ -177,15 +177,15 @@ const QuizDetails = () => {
           </div>
         </Card>
 
-        <h2 className="text-2xl font-bold mb-4">Questions ({questions?.length || 0})</h2>
+        <h2 className="text-2xl font-bold mb-4 dark:text-zinc-200">Questions ({questions?.length || 0})</h2>
         <div className="space-y-4">
           {questions?.map((question, index) => (
             <Card key={question._id} className="p-6">
               <div className="flex justify-between items-start mb-3">
-                <h3 className="font-semibold text-lg">Question {index + 1}</h3>
+                <h3 className="font-semibold text-lg text-orange-200">Question {index + 1}</h3>
                 <span className="text-sm text-muted-foreground">{question.time_limit}s</span>
               </div>
-              <p className="mb-3">{question.question_text}</p>
+              <p className="mb-3 dark:text-zinc-200">{question.question_text}</p>
               {question.question_image_url && (
                 <img
                   src={question.question_image_url}
@@ -193,7 +193,7 @@ const QuizDetails = () => {
                   className="w-full max-h-64 object-cover rounded-lg mb-3"
                 />
               )}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 dark:text-zinc-300">
                 {['A', 'B', 'C', 'D'].map(option => {
                   const optionText = question[`option_${option.toLowerCase()}`];
                   if (!optionText) return null;

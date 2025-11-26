@@ -161,7 +161,7 @@ const PlayQuiz = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white/40 via-white/60 to-white/80 dark:bg-gradient-to-b dark:from-black/80 dark:via-black/80 dark:to-black/80 pt-4 pb-4">
       <div className="container max-w-md sm:max-w-2xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mt-12">
-        <Card className="p-4 mb-6">
+        <Card className="p-1 mb-6">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold mb-2 dark:text-white/80">{quiz?.title}</h1>
@@ -175,7 +175,7 @@ const PlayQuiz = () => {
 
         {session.status === 'waiting' && (
           <Card className="p-12 text-center animate-in fade-in zoom-in-95 duration-500">
-            <h2 className="text-3xl font-bold mb-4 dark:text-zinc-400">Get Ready!</h2>
+            <h2 className="text-3xl font-bold mb-4 dark:text-zinc-300">Get Ready!</h2>
             <p className="text-xl text-muted-foreground">
               Waiting for the host to start the quiz...
             </p>
@@ -308,16 +308,16 @@ const PlayQuiz = () => {
         )}
 
         {session.status === 'finished' && (
-          <Card className="px-5 pb-8 text-center animate-in fade-in zoom-in-95 duration-700">
+          <Card className="px-2 pb-8 text-center animate-in fade-in zoom-in-95 duration-700">
             <DotLottieReact src="../../public/Trophy.lottie" autoplay
               className="h-32 w-32 sm:h-32 sm:w-32 md:h-32 md:w-32 lg:h-40 lg:w-40  mx-auto" />
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl  font-bold mb-2">Final Leaderboard!</h2>
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl  font-bold mb-2 dark:text-zinc-300">Final Leaderboard!</h2>
             <div className="my-5">
               <h4 className="text-xl font-semibold dark:text-white/90">You finished {rankText}!</h4>
               <p className="text-sm dark:text-white/70">Correct answers: {participant?.score || 0}</p>
               <p className="text-sm dark:text-white/70">Voting time: {lastTimeText}</p>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 dark:text-zinc-200">
               {allParticipants?.map((p, i) => (
                 <div
                   key={p._id}
@@ -337,7 +337,7 @@ const PlayQuiz = () => {
             <Button
               variant="ghost"
               onClick={() => navigate('/dashboard')}
-              className="my-3 mt-6 rounded-full"
+              className="my-3 mt-6 rounded-full dark:text-zinc-400 hover:dark:text-black"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Home
