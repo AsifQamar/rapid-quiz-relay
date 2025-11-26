@@ -10,7 +10,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white/40 via-accent/60 to-white/80 dark:bg-gradient-to-b dark:from-black/80 dark:via-black/80 dark:to-black/80">
       <div className="fixed top-4 left-4 md:top-8 md:left-8 z-50">
-        <img src="/logo.png" alt="Quizora Logo" className="h-12 w-12 md:h-16 md:w-16" />
+        <img src="https://ik.imagekit.io/devsoc/Quizora/public/logo.png?updatedAt=1764162094557" alt="Quizora Logo" className="h-12 w-12 md:h-16 md:w-16" />
       </div>
 
       <div className="container mx-auto px-4 py-12">
